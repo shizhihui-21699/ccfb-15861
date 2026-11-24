@@ -1,0 +1,43 @@
+[package]
+name = "certcode"
+version = "0.1.0"
+edition = "2021"
+description = "Offline-verifiable cryptographic anti-counterfeit code for printed certificates"
+license = "MIT"
+
+[lib]
+name = "certcode"
+path = "src/lib.rs"
+
+[[bin]]
+name = "certcode"
+path = "src/main.rs"
+
+[dependencies]
+# 签名:使用经过广泛审计的 Ed25519,不自行实现密码学原语
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+rand = "0.8"
+sha2 = "0.10"
+# QR 码编解码
+qrcode = "0.14"
+# rqrr 0.7 配套 image 0.24;0.8 升级到 image 0.25(trait 改名)会造成类型不兼容
+rqrr = "0.7"
+# qrcode 0.14 与 rqrr 0.7 均依赖 image 0.25,直接依赖必须同版本,
+# 否则类型跨 crate 不兼容(GenericImageView trait 对不上)
+image = { version = "0.25", default-features = false, features = ["png"] }
+# 序列化(信任包/密钥目录)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.22"
+# 姓名规范化,保证签名覆盖的字节在不同录入环境下一致
+unicode-normalization = "0.1"
+clap = { version = "4.5", features = ["derive"] }
+hex = "0.4"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true
